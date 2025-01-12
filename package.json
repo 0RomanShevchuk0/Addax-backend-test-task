@@ -6,7 +6,6 @@
   "scripts": {
     "devTs": "nodemon ./src/index.ts",
     "devJs": "nodemon ./dist/index.js",
-    "test": "jest",
     "watchTs": "tsc -w",
     "build": "tsc",
     "start": "node dist/index.js"
