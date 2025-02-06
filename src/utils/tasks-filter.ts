@@ -1,6 +1,6 @@
 import { type FilterQuery } from "mongoose"
 import { type ITask } from "../models/task.model"
-import { type QueryTasksRepositoryType } from "../types/task/task-request.types"
+import { type QueryTasksRepositoryType } from "../types/task/task-request"
 
 export const buildTasksFilterQuery = (params: QueryTasksRepositoryType): FilterQuery<ITask> => {
   const { name, startDate, endDate } = params
