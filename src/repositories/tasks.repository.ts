@@ -33,20 +33,28 @@ export const tasksRepository = {
     return result
   },
 
-  async findOneById(id: string): Promise<ITask | null> {
-    return TaskModel.findOne({ id }).exec()
+  async findOneById(taskId: string, userId: string): Promise<ITask | null> {
+    return TaskModel.findOne({ taskId, userId }).exec()
   },
 
   async createOne(newTask: TaskCreateType): Promise<ITask> {
     return await TaskModel.create(newTask)
   },
 
-  async updateOne(id: string, updatedTask: TaskUpdateType): Promise<ITask | null> {
-    return TaskModel.findOneAndUpdate({ id }, { $set: updatedTask }, { new: true }).exec()
+  async updateOne(
+    taskId: string,
+    userId: string,
+    updatedTask: TaskUpdateType
+  ): Promise<ITask | null> {
+    return TaskModel.findOneAndUpdate(
+      { id: taskId, userId },
+      { $set: updatedTask },
+      { new: true }
+    ).exec()
   },
 
-  async deleteOne(id: string): Promise<boolean> {
-    const result = await TaskModel.deleteOne({ id })
+  async deleteOne(taskId: string, userId: string): Promise<boolean> {
+    const result = await TaskModel.deleteOne({ id: taskId, userId })
     return result.deletedCount === 1
   },
 }

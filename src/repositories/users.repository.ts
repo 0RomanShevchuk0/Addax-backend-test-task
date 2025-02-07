@@ -1,16 +1,15 @@
-import { UserCreateType } from "./../types/user/user-create"
 import { UserUpdateType } from "./../types/user/user-update"
 import { QueryUsersRepositoryType } from "./../types/user/user-request"
 import { calculateSkipValue, hasNextPrevPage } from "../utils/pagination.utils"
-import { buildTasksFilterQuery } from "../utils/tasks-filter"
 import { PaginationResponseType } from "./../types/pagination"
 import { IUser, UserModel } from "../models/user.model"
+import { buildUsersFilterQuery } from "../utils/user-filter"
 
 export const usersRepository = {
   async query(params: QueryUsersRepositoryType): Promise<PaginationResponseType<IUser>> {
     const { pageSize, page: pageNumber } = params
 
-    const filter = buildTasksFilterQuery(params)
+    const filter = buildUsersFilterQuery(params)
 
     const skipValue = calculateSkipValue(pageNumber, pageSize)
 
@@ -34,6 +33,10 @@ export const usersRepository = {
 
   async findOneById(id: string): Promise<IUser | null> {
     return UserModel.findOne({ id }).exec()
+  },
+
+  async findOneByEmail(email: string): Promise<IUser | null> {
+    return UserModel.findOne({ email }).exec()
   },
 
   async createOne(newUser: IUser): Promise<IUser> {

@@ -1,7 +1,7 @@
-import express, { Request, Response } from "express"
+import express from "express"
 import cors, { CorsOptions } from "cors"
-import { tasksRouter } from "./routes/tasks.router"
-import { usersRouter } from "./routes/users.router"
+import AppRouter from "./routes"
+import { errorHandler } from "./middlewares/error-handler/error-handler.midleware"
 
 export const app = express()
 
@@ -14,9 +14,7 @@ const corsOptions: CorsOptions = {
 }
 app.use(cors(corsOptions))
 
-app.get("/", async (req: Request, res: Response) => {
-  res.json("Home")
-})
+const router = new AppRouter(app)
 
-app.use("/tasks", tasksRouter)
-app.use("/users", usersRouter)
+router.init()
+app.use(errorHandler)

@@ -1,6 +1,8 @@
 import { PaginationParamsType, PaginationType } from "../pagination"
 
 export type QueryTasksType = {
+  userId: string
+
   name?: string
   startDate?: string
   endDate?: string
