@@ -1,4 +1,4 @@
-import { Response } from "express"
+import { Request, Response } from "express"
 import { RequestWithBody } from "../types/request.types"
 import { AuthType } from "../types/auth/auth"
 import { usersService } from "../services/users.service"
@@ -7,6 +7,7 @@ import { jwtService } from "../services/jwt.service"
 import { UserCreateType } from "../types/user/user-create"
 import { getUserViewModel } from "../mappers/user.mapper"
 import { createUserErrorHandler } from "../utils/create-user-error-handler"
+import { requestContextService } from "../services/request-context.service"
 
 class AuthController {
   async login(req: RequestWithBody<AuthType>, res: Response) {
@@ -39,6 +40,17 @@ class AuthController {
     } catch (error) {
       createUserErrorHandler(error, res)
     }
+  }
+
+  async me(req: Request, res: Response) {
+    const { user } = requestContextService.getRequestContext()
+
+    if (!user) {
+      res.sendStatus(HTTP_STATUSES.NOT_AUTHORIZED_401)
+      return
+    }
+
+    res.json({ user: getUserViewModel(user) })
   }
 }
 
