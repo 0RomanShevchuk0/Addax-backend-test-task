@@ -34,7 +34,7 @@ export const tasksRepository = {
   },
 
   async findOneById(taskId: string, userId: string): Promise<ITask | null> {
-    return TaskModel.findOne({ taskId, userId }).exec()
+    return TaskModel.findOne({ id: taskId, userId }).exec()
   },
 
   async createOne(newTask: TaskCreateType): Promise<ITask> {

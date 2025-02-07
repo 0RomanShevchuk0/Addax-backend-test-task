@@ -15,6 +15,7 @@ export const taskService = {
 
   async getTaskById(taskId: string, userId: string): Promise<ITask | null> {
     const foundTask = await tasksRepository.findOneById(taskId, userId)
+		
     if (!foundTask) {
       return null
     }
