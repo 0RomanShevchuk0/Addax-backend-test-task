@@ -3,6 +3,7 @@ import { inputValidationMiddlevare } from "../../middlewares/input-validation-mi
 import { userValidation } from "../../validation/user.validation"
 import { userController } from "../../controllers/users.controller"
 import { asyncHandler } from "../../middlewares/error-handler/async-handler"
+import { authMiddleware } from "../../middlewares/auth.middlewware"
 
 export const usersRouter = Router()
 
@@ -19,9 +20,10 @@ usersRouter.post(
 
 usersRouter.patch(
   "/:id",
+  authMiddleware,
   userValidation,
   inputValidationMiddlevare,
   asyncHandler(userController.updateOne)
 )
 
-usersRouter.delete("/:id", asyncHandler(userController.deleteOne))
+usersRouter.delete("/:id", authMiddleware, asyncHandler(userController.deleteOne))

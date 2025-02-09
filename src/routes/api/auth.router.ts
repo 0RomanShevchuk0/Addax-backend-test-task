@@ -7,12 +7,7 @@ import { authMiddleware } from "../../middlewares/auth.middlewware"
 
 export const authRouter = Router()
 
-authRouter.post(
-  "/login",
-  authValidation,
-  inputValidationMiddlevare,
-  asyncHandler(authController.login)
-)
+authRouter.post("/login", asyncHandler(authController.login))
 
 authRouter.post(
   "/register",
