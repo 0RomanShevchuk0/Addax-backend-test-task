@@ -1,6 +1,6 @@
 import { Router } from "express"
 import { inputValidationMiddlevare } from "../../middlewares/input-validation-middlevare"
-import { userValidation } from "../../validation/user.validation"
+import { userCreateValidation, userUpdateValidation } from "../../validation/user.validation"
 import { userController } from "../../controllers/users.controller"
 import { asyncHandler } from "../../middlewares/error-handler/async-handler"
 import { authMiddleware } from "../../middlewares/auth.middlewware"
@@ -13,7 +13,7 @@ usersRouter.get("/:id", asyncHandler(userController.getById))
 
 usersRouter.post(
   "/",
-  userValidation,
+  userCreateValidation,
   inputValidationMiddlevare,
   asyncHandler(userController.createOne)
 )
@@ -21,7 +21,7 @@ usersRouter.post(
 usersRouter.patch(
   "/:id",
   authMiddleware,
-  userValidation,
+  userUpdateValidation,
   inputValidationMiddlevare,
   asyncHandler(userController.updateOne)
 )
