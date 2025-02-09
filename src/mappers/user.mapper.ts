@@ -5,5 +5,6 @@ export const getUserViewModel = (dbUser: IUser): UserViewType => {
   return {
     id: dbUser.id,
     email: dbUser.email,
+    name: dbUser.name,
   }
 }

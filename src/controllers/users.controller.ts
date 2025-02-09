@@ -13,7 +13,6 @@ import { UserCreateType } from "../types/user/user-create"
 import { Result, ValidationError } from "express-validator"
 import { UserUpdateType } from "../types/user/user-update"
 import { getUserViewModel } from "../mappers/user.mapper"
-import { MONGO_ERROR_CODES } from "../constants/mongoErrorCodes"
 import { HTTP_STATUSES } from "../constants/httpStatuses"
 import { createUserErrorHandler } from "../utils/create-user-error-handler"
 
