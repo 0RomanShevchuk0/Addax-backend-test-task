@@ -4,7 +4,7 @@ import { QueryUsersRepositoryType } from "./../types/user/user-request"
 import { usersRepository } from "../repositories/users.repository"
 import { PaginationResponseType } from "./../types/pagination"
 import bcrypt from "bcrypt"
-import { User } from "@prisma/client"
+import { Prisma, User } from "@prisma/client"
 
 class UsersService {
   async getPaginatedUsers(params: QueryUsersRepositoryType): Promise<PaginationResponseType<User>> {
@@ -33,18 +33,28 @@ class UsersService {
     const passwordSalt = await bcrypt.genSalt(10)
     const passwordHash = await bcrypt.hash(body.password, passwordSalt)
 
-    const createdUser = await usersRepository.createOne(body.email, passwordHash)
+    const newUser: Prisma.UserUncheckedCreateInput = {
+      email: body.email,
+      passwordHash,
+    }
+
+    const createdUser = await usersRepository.createOne(newUser)
     return createdUser
   }
 
   async updateUser(id: string, body: UserUpdateType): Promise<User | null> {
-    const updatedUser = await usersRepository.updateOne(id, body)
+    const updatedUser: Prisma.UserUncheckedUpdateInput = {
+      email: body.email,
+      name: body.name,
+    }
 
-    if (!updatedUser) {
+    const updatedUserResponse = await usersRepository.updateOne(id, updatedUser)
+
+    if (!updatedUserResponse) {
       return null
     }
 
-    return updatedUser
+    return updatedUserResponse
   }
 
   async deleteUser(id: string) {

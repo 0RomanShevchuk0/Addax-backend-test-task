@@ -3,7 +3,7 @@ import { type TaskCreateType } from "../types/task/task-create"
 import { type QueryTasksRepositoryType } from "../types/task/task-request"
 import { type PaginationResponseType } from "./../types/pagination"
 import { calculateSkipValue, hasNextPrevPage } from "../utils/pagination.utils"
-import { Task } from "@prisma/client"
+import { Prisma, Task } from "@prisma/client"
 import prisma from "../config/prisma.client"
 
 class TasksRepository {
@@ -47,26 +47,23 @@ class TasksRepository {
     return prisma.task.findFirst({ where: { id: taskId, userId } })
   }
 
-  async createOne(userId: string, body: TaskCreateType): Promise<Task> {
-    return prisma.task.create({
-      data: {
-        name: body.name,
-        date: body.date,
-        notes: body.notes,
-        color: body.color,
-        userId: userId,
-      },
-    })
+  async createOne(newTask: Prisma.TaskUncheckedCreateInput): Promise<Task> {
+    return prisma.task.create({ data: newTask })
   }
 
   async updateOne(
     taskId: string,
     userId: string,
-    updatedTask: TaskUpdateType
+    updatedTask: Prisma.TaskUncheckedUpdateInput
   ): Promise<Task | null> {
     return prisma.task.update({
       where: { id: taskId, userId },
-      data: updatedTask,
+      data: {
+        name: updatedTask.name,
+        date: updatedTask.date,
+        notes: updatedTask.notes,
+        color: updatedTask.color,
+      },
     })
   }
 

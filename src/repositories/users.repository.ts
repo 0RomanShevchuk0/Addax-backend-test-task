@@ -3,7 +3,7 @@ import { QueryUsersRepositoryType } from "./../types/user/user-request"
 import { calculateSkipValue, hasNextPrevPage } from "../utils/pagination.utils"
 import { PaginationResponseType } from "./../types/pagination"
 import prisma from "../config/prisma.client"
-import { User } from "@prisma/client"
+import { Prisma, User } from "@prisma/client"
 
 class UsersRepository {
   async query(params: QueryUsersRepositoryType): Promise<PaginationResponseType<User>> {
@@ -41,11 +41,11 @@ class UsersRepository {
     return prisma.user.findFirst({ where: { email } })
   }
 
-  async createOne(email: string, passwordHash: string): Promise<User> {
-    return prisma.user.create({ data: { email, passwordHash } })
+  async createOne(newUser: Prisma.UserUncheckedCreateInput): Promise<User> {
+    return prisma.user.create({ data: newUser })
   }
 
-  async updateOne(id: string, updatedUser: UserUpdateType): Promise<User | null> {
+  async updateOne(id: string, updatedUser: Prisma.UserUncheckedUpdateInput): Promise<User | null> {
     return await prisma.user.update({ where: { id }, data: updatedUser })
   }
 

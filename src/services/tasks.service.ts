@@ -3,7 +3,7 @@ import { TaskUpdateType } from "../types/task/task-update"
 import { TaskCreateType } from "../types/task/task-create"
 import { tasksRepository } from "../repositories/tasks.repository"
 import { PaginationResponseType } from "../types/pagination"
-import { Task } from "@prisma/client"
+import { Prisma, Task } from "@prisma/client"
 
 class TaskService {
   async getPaginatedTasks(params: QueryTasksRepositoryType): Promise<PaginationResponseType<Task>> {
@@ -21,19 +21,33 @@ class TaskService {
   }
 
   async createTask(userId: string, body: TaskCreateType): Promise<Task> {
-    const createdTask = await tasksRepository.createOne(userId, body)
+    const newTask: Prisma.TaskUncheckedCreateInput = {
+      name: body.name,
+      date: new Date(body.date),
+      notes: body.notes,
+      color: body.color,
+      userId: userId,
+    }
+    const createdTask = await tasksRepository.createOne(newTask)
 
     return createdTask
   }
 
   async updateTask(taskId: string, userId: string, body: TaskUpdateType): Promise<Task | null> {
-    const updatedTask = await tasksRepository.updateOne(taskId, userId, body)
+    const updatedTask: Prisma.TaskUncheckedUpdateInput = {
+      name: body.name,
+      date: new Date(body.date),
+      notes: body.notes,
+      color: body.color,
+    }
 
-    if (!updatedTask) {
+    const updatedTaskResponse = await tasksRepository.updateOne(taskId, userId, updatedTask)
+
+    if (!updatedTaskResponse) {
       return null
     }
 
-    return updatedTask
+    return updatedTaskResponse
   }
 
   async deleteTask(taskId: string, userId: string) {

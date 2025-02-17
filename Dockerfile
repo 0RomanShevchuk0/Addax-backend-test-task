@@ -25,12 +25,9 @@ FROM base as deps
 # Leverage bind mounts to package.json and package-lock.json to avoid having to copy them
 # into this layer.
 RUN --mount=type=bind,source=package.json,target=package.json \
-    --mount=type=bind,source=package-lock.json,target=package-lock.json \
-		# --mount=type=bind,source=./prisma/schema.prisma,target=/prisma/schema.prisma \
-    --mount=type=cache,target=/root/.npm \
-    npm ci --omit=dev
-
-# RUN npx prisma generate
+	--mount=type=bind,source=package-lock.json,target=package-lock.json \
+	--mount=type=cache,target=/root/.npm \
+	npm ci --omit=dev
 
 ################################################################################
 # Create a stage for building the application.
@@ -39,9 +36,9 @@ FROM deps as build
 # Download additional development dependencies before building, as some projects require
 # "devDependencies" to be installed to build. If you don't need this, remove this step.
 RUN --mount=type=bind,source=package.json,target=package.json \
-    --mount=type=bind,source=package-lock.json,target=package-lock.json \
-    --mount=type=cache,target=/root/.npm \
-    npm ci
+	--mount=type=bind,source=package-lock.json,target=package-lock.json \
+	--mount=type=cache,target=/root/.npm \
+	npm ci
 
 # Copy the rest of the source files into the image.
 COPY . .
@@ -70,8 +67,7 @@ COPY package.json .
 # the built application from the build stage into the image.
 COPY --from=deps /usr/src/app/node_modules ./node_modules
 COPY --from=build /usr/src/app/dist ./dist
-COPY --from=build /usr/src/app/prisma ./prisma
-
+COPY --from=build /usr/src/app/node_modules/.prisma ./node_modules/.prisma
 
 # Expose the port that the application listens on.
 EXPOSE 4200
