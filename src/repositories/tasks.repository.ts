@@ -17,6 +17,7 @@ class TasksRepository {
         skip: skipValue,
         take: pageSize,
         where: {
+          userId: params.userId,
           name: {
             mode: "insensitive",
             contains: params.name,
