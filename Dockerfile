@@ -26,8 +26,11 @@ FROM base as deps
 # into this layer.
 RUN --mount=type=bind,source=package.json,target=package.json \
     --mount=type=bind,source=package-lock.json,target=package-lock.json \
+		# --mount=type=bind,source=./prisma/schema.prisma,target=/prisma/schema.prisma \
     --mount=type=cache,target=/root/.npm \
     npm ci --omit=dev
+
+# RUN npx prisma generate
 
 ################################################################################
 # Create a stage for building the application.
@@ -42,6 +45,10 @@ RUN --mount=type=bind,source=package.json,target=package.json \
 
 # Copy the rest of the source files into the image.
 COPY . .
+
+# Run Prisma generate to create the client and types
+RUN npx prisma generate
+
 # Run the build script.
 RUN npm run build
 
@@ -63,6 +70,7 @@ COPY package.json .
 # the built application from the build stage into the image.
 COPY --from=deps /usr/src/app/node_modules ./node_modules
 COPY --from=build /usr/src/app/dist ./dist
+COPY --from=build /usr/src/app/prisma ./prisma
 
 
 # Expose the port that the application listens on.

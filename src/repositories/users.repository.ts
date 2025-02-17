@@ -2,25 +2,27 @@ import { UserUpdateType } from "./../types/user/user-update"
 import { QueryUsersRepositoryType } from "./../types/user/user-request"
 import { calculateSkipValue, hasNextPrevPage } from "../utils/pagination.utils"
 import { PaginationResponseType } from "./../types/pagination"
-import { IUser, UserModel } from "../models/user.model"
-import { buildUsersFilterQuery } from "../utils/user-filter"
+import prisma from "../config/prisma.client"
+import { User } from "@prisma/client"
 
-export const usersRepository = {
-  async query(params: QueryUsersRepositoryType): Promise<PaginationResponseType<IUser>> {
+class UsersRepository {
+  async query(params: QueryUsersRepositoryType): Promise<PaginationResponseType<User>> {
     const { pageSize, page: pageNumber } = params
-
-    const filter = buildUsersFilterQuery(params)
 
     const skipValue = calculateSkipValue(pageNumber, pageSize)
 
     const [users, totalCount] = await Promise.all([
-      UserModel.find(filter).sort().skip(skipValue).limit(pageSize),
-      UserModel.countDocuments(filter),
+      prisma.user.findMany({
+        skip: skipValue,
+        take: pageSize,
+        where: { email: { mode: "insensitive", contains: params.email } },
+      }),
+      prisma.user.count(),
     ])
 
     const { hasNextPage, hasPreviousPage } = hasNextPrevPage(pageNumber, pageSize, totalCount)
 
-    const result: PaginationResponseType<IUser> = {
+    const result: PaginationResponseType<User> = {
       hasNextPage,
       hasPreviousPage,
       totalCount,
@@ -29,26 +31,28 @@ export const usersRepository = {
       items: users,
     }
     return result
-  },
+  }
 
-  async findOneById(id: string): Promise<IUser | null> {
-    return UserModel.findOne({ id }).exec()
-  },
+  async findOneById(id: string): Promise<User | null> {
+    return prisma.user.findFirst({ where: { id } })
+  }
 
-  async findOneByEmail(email: string): Promise<IUser | null> {
-    return UserModel.findOne({ email }).exec()
-  },
+  async findOneByEmail(email: string): Promise<User | null> {
+    return prisma.user.findFirst({ where: { email } })
+  }
 
-  async createOne(newUser: IUser): Promise<IUser> {
-    return await UserModel.create(newUser)
-  },
+  async createOne(email: string, passwordHash: string): Promise<User> {
+    return prisma.user.create({ data: { email, passwordHash } })
+  }
 
-  async updateOne(id: string, updatedUser: UserUpdateType): Promise<IUser | null> {
-    return UserModel.findOneAndUpdate({ id }, { $set: updatedUser }, { new: true }).exec()
-  },
+  async updateOne(id: string, updatedUser: UserUpdateType): Promise<User | null> {
+    return await prisma.user.update({ where: { id }, data: updatedUser })
+  }
 
   async deleteOneById(id: string): Promise<boolean> {
-    const result = await UserModel.deleteOne({ id })
-    return result.deletedCount === 1
-  },
+    const result = await prisma.user.delete({ where: { id } })
+    return !!result.id
+  }
 }
+
+export const usersRepository = new UsersRepository()

@@ -1,8 +1,8 @@
+import { User } from "@prisma/client"
 import { AsyncLocalStorage } from "node:async_hooks"
-import { IUser } from "../models/user.model"
 
 interface RequestContext {
-  user?: IUser
+  user?: User
 }
 
 class RequestContextService {

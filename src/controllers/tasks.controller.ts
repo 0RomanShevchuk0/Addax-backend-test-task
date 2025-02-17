@@ -9,7 +9,7 @@ import { QueryTasksRouterType, URIParamTaskIdType } from "../types/task/task-req
 import { PaginationResponseType } from "../types/pagination"
 import { TaskViewType } from "../types/task/task-view"
 import { HTTP_STATUSES } from "../constants/httpStatuses"
-import { taskService } from "../services/tasks.service"
+import { tasksService } from "../services/tasks.service"
 import { TaskCreateType } from "../types/task/task-create"
 import { Result, ValidationError } from "express-validator"
 import { TaskUpdateType } from "../types/task/task-update"
@@ -33,7 +33,7 @@ class TasksController {
       return
     }
 
-    const tasksResponse = await taskService.getPaginatedTasks({
+    const tasksResponse = await tasksService.getPaginatedTasks({
       userId: user.id,
       name: queryPrams.name,
       startDate: queryPrams.startDate,
@@ -62,7 +62,7 @@ class TasksController {
       return
     }
 
-    const foundTask = await taskService.getTaskById(taskId, user.id)
+    const foundTask = await tasksService.getTaskById(taskId, user.id)
     if (!foundTask) {
       res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
       return
@@ -82,7 +82,7 @@ class TasksController {
       return
     }
 
-    const createdTask = await taskService.createTask(user.id, req.body)
+    const createdTask = await tasksService.createTask(user.id, req.body)
     res.status(HTTP_STATUSES.CREATED_201).json(getTaskViewModel(createdTask))
   }
 
@@ -99,7 +99,7 @@ class TasksController {
       return
     }
 
-    const updatedTask = await taskService.updateTask(taskId, user.id, req.body)
+    const updatedTask = await tasksService.updateTask(taskId, user.id, req.body)
 
     if (!updatedTask) {
       res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
@@ -119,7 +119,7 @@ class TasksController {
       return
     }
 
-    const isDeleted = await taskService.deleteTask(taskId, user.id)
+    const isDeleted = await tasksService.deleteTask(taskId, user.id)
     const resultStatus = isDeleted ? HTTP_STATUSES.NO_CONTENT_204 : HTTP_STATUSES.NOT_FOUND_404
 
     res.sendStatus(resultStatus)
