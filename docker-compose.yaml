@@ -31,6 +31,19 @@ services:
       - "${PORT}:${PORT}"
     depends_on:
       - db
+    restart: always
+    develop:
+      watch:
+        - action: sync
+          path: .
+          target: /app
+          ignore:
+            - node_modules/
+            - .git/
+        - action: rebuild
+          path: package.json
+        - action: rebuild
+          path: .
 
   db:
     image: postgres:15
@@ -79,8 +92,6 @@ volumes:
 # secrets:
 #   db-password:
 #     file: db/password.txt
-
-
 
 # The commented out section below is an example of how to define a PostgreSQL
 # database that your application can use. `depends_on` tells Docker Compose to

@@ -1,10 +1,10 @@
 import { UserUpdateType } from "./../types/user/user-update"
 import { UserCreateType } from "./../types/user/user-create"
 import { QueryUsersRepositoryType } from "./../types/user/user-request"
-import { usersRepository } from "../repositories/users.repository"
 import { PaginationResponseType } from "./../types/pagination"
 import bcrypt from "bcrypt"
 import { Prisma, User } from "@prisma/client"
+import { usersRepository } from "../repositories/users.repository"
 
 class UsersService {
   async getPaginatedUsers(params: QueryUsersRepositoryType): Promise<PaginationResponseType<User>> {
