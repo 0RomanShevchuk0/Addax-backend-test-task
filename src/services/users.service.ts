@@ -77,9 +77,9 @@ class UsersService {
     return user
   }
 
-  async uploadAvatar(userId: string, file: Express.Multer.File): Promise<User | null> {
+  async uploadAvatar(user: User, file: Express.Multer.File): Promise<string | null> {
     const bucketName = "addax-test-task"
-    const fileKey = `avatars/${userId}/${Date.now()}_${file.originalname}`
+    const fileKey = `avatars/${user.id}/${Date.now()}_${file.originalname}`
 
     const avatarUrl = await s3Service.uploadFile(bucketName, fileKey, file)
 
@@ -87,8 +87,14 @@ class UsersService {
       return null
     }
 
-    const user = await usersRepository.updateOne(userId, { avatarUrl })
-    return user
+    if (user.avatarUrl) {
+      const currentAvatarFileKey = new URL(user.avatarUrl).pathname.slice(1)
+      const result = await s3Service.deleteFile(bucketName, currentAvatarFileKey)
+      console.log("UsersServiceuploadAvatar result:", result)
+    }
+
+    const updatedUser = await usersRepository.updateOne(user.id, { avatarUrl })
+    return updatedUser?.avatarUrl || null
   }
 }
 

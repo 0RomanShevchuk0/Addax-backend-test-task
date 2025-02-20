@@ -107,14 +107,14 @@ class UsersController {
       return res.status(HTTP_STATUSES.BAD_REQUEST_400).json({ message: "Invalid file type" })
     }
 
-    const updatedUser = await usersService.uploadAvatar(user.id, file)
+    const avatarUrl = await usersService.uploadAvatar(user, file)
 
-    if (!updatedUser) {
+    if (!avatarUrl) {
       res.sendStatus(HTTP_STATUSES.BAD_REQUEST_400)
       return
     }
 
-    res.status(HTTP_STATUSES.OK_200).json(mapUserToView(updatedUser))
+    res.status(HTTP_STATUSES.OK_200).json({ avatarUrl })
   }
 }
 
