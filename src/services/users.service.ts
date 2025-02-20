@@ -1,3 +1,4 @@
+import { body } from "express-validator"
 import { UserUpdateType } from "./../types/user/user-update"
 import { UserCreateType } from "./../types/user/user-create"
 import { QueryUsersRepositoryType } from "./../types/user/user-request"
@@ -5,6 +6,9 @@ import { PaginationResponseType } from "./../types/pagination"
 import bcrypt from "bcrypt"
 import { Prisma, User } from "@prisma/client"
 import { usersRepository } from "../repositories/users.repository"
+import s3 from "../config/s3Client"
+import { PutObjectCommand, PutObjectCommandInput } from "@aws-sdk/client-s3"
+import { s3Service } from "./s3.service"
 
 class UsersService {
   async getPaginatedUsers(params: QueryUsersRepositoryType): Promise<PaginationResponseType<User>> {
@@ -70,6 +74,20 @@ class UsersService {
 
     if (!isValid) return null
 
+    return user
+  }
+
+  async uploadAvatar(userId: string, file: Express.Multer.File): Promise<User | null> {
+    const bucketName = "addax-test-task"
+    const fileKey = `avatars/${userId}/${Date.now()}_${file.originalname}`
+
+    const avatarUrl = await s3Service.uploadFile(bucketName, fileKey, file)
+
+    if (!avatarUrl) {
+      return null
+    }
+
+    const user = await usersRepository.updateOne(userId, { avatarUrl })
     return user
   }
 }

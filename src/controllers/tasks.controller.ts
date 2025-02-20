@@ -13,7 +13,7 @@ import { tasksService } from "../services/tasks.service"
 import { TaskCreateType } from "../types/task/task-create"
 import { Result, ValidationError } from "express-validator"
 import { TaskUpdateType } from "../types/task/task-update"
-import { getTaskViewModel } from "../mappers/task.mapper"
+import { mapTaskToView } from "../mappers/task.mapper"
 import { requestContextService } from "../services/request-context.service"
 
 class TasksController {
@@ -48,7 +48,7 @@ class TasksController {
       page: tasksResponse.page,
       pageSize: tasksResponse.pageSize,
       totalCount: tasksResponse.totalCount,
-      items: tasksResponse.items.map(getTaskViewModel),
+      items: tasksResponse.items.map(mapTaskToView),
     })
   }
 
@@ -68,7 +68,7 @@ class TasksController {
       return
     }
 
-    res.json(getTaskViewModel(foundTask))
+    res.json(mapTaskToView(foundTask))
   }
 
   async createOne(
@@ -83,7 +83,7 @@ class TasksController {
     }
 
     const createdTask = await tasksService.createTask(user.id, req.body)
-    res.status(HTTP_STATUSES.CREATED_201).json(getTaskViewModel(createdTask))
+    res.status(HTTP_STATUSES.CREATED_201).json(mapTaskToView(createdTask))
   }
 
   async updateOne(
@@ -106,7 +106,7 @@ class TasksController {
       return
     }
 
-    res.status(HTTP_STATUSES.OK_200).json(getTaskViewModel(updatedTask))
+    res.status(HTTP_STATUSES.OK_200).json(mapTaskToView(updatedTask))
   }
 
   async deleteOne(req: RequestWithParams<URIParamTaskIdType>, res: Response) {

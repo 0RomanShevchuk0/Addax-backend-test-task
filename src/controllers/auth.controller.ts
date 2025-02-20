@@ -3,7 +3,7 @@ import { RequestWithBody } from "../types/request.types"
 import { AuthType } from "../types/auth/auth"
 import { HTTP_STATUSES } from "../constants/httpStatuses"
 import { UserCreateType } from "../types/user/user-create"
-import { getUserViewModel } from "../mappers/user.mapper"
+import { mapUserToView } from "../mappers/user.mapper"
 import { createUserErrorHandler } from "../utils/create-user-error-handler"
 import { requestContextService } from "../services/request-context.service"
 import { authService } from "../services/auth.service"
@@ -19,7 +19,7 @@ class AuthController {
       return
     }
 
-    res.json({ accessToken, user: getUserViewModel(user) })
+    res.json({ accessToken, user: mapUserToView(user) })
   }
 
   async register(req: RequestWithBody<UserCreateType>, res: Response) {
@@ -31,7 +31,7 @@ class AuthController {
         return
       }
 
-      res.json({ accessToken, user: getUserViewModel(user) })
+      res.json({ accessToken, user: mapUserToView(user) })
     } catch (error) {
       createUserErrorHandler(error, res)
     }
@@ -45,7 +45,7 @@ class AuthController {
       return
     }
 
-    res.json({ user: getUserViewModel(user) })
+    res.json({ user: mapUserToView(user) })
   }
 }
 

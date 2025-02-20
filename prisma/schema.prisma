@@ -16,8 +16,9 @@ datasource db {
 
 model User {
   id           String  @id @default(uuid())
-  name         String?
   email        String  @unique
+  name         String?
+  avatarUrl    String?
   passwordHash String
   Task         Task[]
 }
