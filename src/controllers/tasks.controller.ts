@@ -8,7 +8,7 @@ import {
 import { QueryTasksRouterType, URIParamTaskIdType } from "../types/task/task-request"
 import { PaginationResponseType } from "../types/pagination"
 import { TaskViewType } from "../types/task/task-view"
-import { HTTP_STATUSES } from "../constants/httpStatuses"
+import { HTTP_STATUSES } from "../constants/http-statuses"
 import { tasksService } from "../services/tasks.service"
 import { TaskCreateType } from "../types/task/task-create"
 import { Result, ValidationError } from "express-validator"

@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express"
-import { HTTP_STATUSES } from "../constants/httpStatuses"
+import { HTTP_STATUSES } from "../constants/http-statuses"
 import { jwtService } from "../services/jwt.service"
 import { usersService } from "../services/users.service"
 import { requestContextService } from "../services/request-context.service"

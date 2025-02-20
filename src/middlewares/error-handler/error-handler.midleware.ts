@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express"
-import { HTTP_STATUSES } from "../../constants/httpStatuses"
+import { HTTP_STATUSES } from "../../constants/http-statuses"
 
 const errorMessages: Record<number | "default", string> = {
   400: "Bad Request",

@@ -13,9 +13,10 @@ import { UserCreateType } from "../types/user/user-create"
 import { Result, ValidationError } from "express-validator"
 import { UserUpdateType } from "../types/user/user-update"
 import { mapUserToView } from "../mappers/user.mapper"
-import { HTTP_STATUSES } from "../constants/httpStatuses"
+import { HTTP_STATUSES } from "../constants/http-statuses"
 import { createUserErrorHandler } from "../utils/create-user-error-handler"
 import { requestContextService } from "../services/request-context.service"
+import { imageMimeTypes } from "../constants/mime-types"
 
 class UsersController {
   async getAll(
@@ -100,6 +101,10 @@ class UsersController {
     const file = req.file
     if (!file) {
       return res.status(HTTP_STATUSES.BAD_REQUEST_400).json({ message: "No file uploaded" })
+    }
+
+    if (!imageMimeTypes.includes(file.mimetype)) {
+      return res.status(HTTP_STATUSES.BAD_REQUEST_400).json({ message: "Invalid file type" })
     }
 
     const updatedUser = await usersService.uploadAvatar(user.id, file)

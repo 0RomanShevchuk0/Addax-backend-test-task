@@ -1,6 +1,6 @@
 import { Response } from "express"
-import { HTTP_STATUSES } from "../constants/httpStatuses"
-import { MONGO_ERROR_CODES } from "../constants/mongoErrorCodes"
+import { HTTP_STATUSES } from "../constants/http-statuses"
+import { MONGO_ERROR_CODES } from "../constants/mongo-error-codes"
 
 export const createUserErrorHandler = (error: any, res: Response) => {
   console.error("Error creating user:", error)
