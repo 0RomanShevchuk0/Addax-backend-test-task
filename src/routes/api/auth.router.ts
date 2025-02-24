@@ -11,8 +11,8 @@ authRouter.post("/login", asyncHandler(authController.login))
 
 authRouter.post(
   "/register",
-  authValidation,
   inputValidationMiddlevare,
+  authValidation,
   asyncHandler(authController.register)
 )
 

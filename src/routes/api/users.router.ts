@@ -4,6 +4,7 @@ import { userCreateValidation, userUpdateValidation } from "../../validation/use
 import { userController } from "../../controllers/users.controller"
 import { asyncHandler } from "../../middlewares/error-handler/async-handler"
 import { authMiddleware } from "../../middlewares/auth.middlewware"
+import { upload } from "../../config/multer.config"
 
 export const usersRouter = Router()
 
@@ -16,6 +17,13 @@ usersRouter.post(
   userCreateValidation,
   inputValidationMiddlevare,
   asyncHandler(userController.createOne)
+)
+
+usersRouter.post(
+  "/upload-avatar",
+  upload.single("avatar"),
+  authMiddleware,
+  asyncHandler(userController.uploadProfilePhoto)
 )
 
 usersRouter.patch(

@@ -1,14 +1,14 @@
+import { User } from "@prisma/client"
 import { UserCreateType } from "./../types/user/user-create"
-import { IUser } from "../models/user.model"
 import { jwtService } from "./jwt.service"
 import { usersService } from "./users.service"
 
 type authReturnType = {
-  user: IUser | null
+  user: User | null
   accessToken: string | null
 }
 
-export const authService = {
+class AuthService {
   async login(email: string, password: string): Promise<authReturnType> {
     const user = await usersService.checkCredetrials(email, password)
     let accessToken = null
@@ -18,7 +18,7 @@ export const authService = {
     }
 
     return { user, accessToken }
-  },
+  }
 
   async register(newUserData: UserCreateType): Promise<authReturnType> {
     const user = await usersService.createUser(newUserData)
@@ -29,5 +29,7 @@ export const authService = {
     }
 
     return { user, accessToken }
-  },
+  }
 }
+
+export const authService = new AuthService()

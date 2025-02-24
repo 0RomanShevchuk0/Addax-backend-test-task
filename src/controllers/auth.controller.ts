@@ -1,12 +1,13 @@
 import { Request, Response } from "express"
 import { RequestWithBody } from "../types/request.types"
 import { AuthType } from "../types/auth/auth"
-import { HTTP_STATUSES } from "../constants/httpStatuses"
+import { HTTP_STATUSES } from "../constants/http-statuses"
 import { UserCreateType } from "../types/user/user-create"
-import { getUserViewModel } from "../mappers/user.mapper"
-import { createUserErrorHandler } from "../utils/create-user-error-handler"
+import { mapUserToView } from "../mappers/user.mapper"
+import { prismaErrorsHandler } from "../utils/prisma-error-handler"
 import { requestContextService } from "../services/request-context.service"
 import { authService } from "../services/auth.service"
+import { emailService } from "../services/email.service"
 
 class AuthController {
   async login(req: RequestWithBody<AuthType>, res: Response) {
@@ -19,7 +20,9 @@ class AuthController {
       return
     }
 
-    res.json({ accessToken, user: getUserViewModel(user) })
+    await emailService.sendWelcomeEmail(user.email, user.name)
+
+    res.json({ accessToken, user: mapUserToView(user) })
   }
 
   async register(req: RequestWithBody<UserCreateType>, res: Response) {
@@ -31,9 +34,11 @@ class AuthController {
         return
       }
 
-      res.json({ accessToken, user: getUserViewModel(user) })
+      await emailService.sendWelcomeEmail(user.email, user.name)
+
+      res.json({ accessToken, user: mapUserToView(user) })
     } catch (error) {
-      createUserErrorHandler(error, res)
+      prismaErrorsHandler(error, res)
     }
   }
 
@@ -45,7 +50,7 @@ class AuthController {
       return
     }
 
-    res.json({ user: getUserViewModel(user) })
+    res.json({ user: mapUserToView(user) })
   }
 }
 

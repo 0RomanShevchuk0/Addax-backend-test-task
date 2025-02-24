@@ -1,7 +1,7 @@
-import { ITask } from "../models/task.model"
+import { Task } from "@prisma/client"
 import { TaskViewType } from "../types/task/task-view"
 
-export const getTaskViewModel = (dbTask: ITask): TaskViewType => {
+export const mapTaskToView = (dbTask: Task): TaskViewType => {
   return {
     id: dbTask.id,
     name: dbTask.name,
