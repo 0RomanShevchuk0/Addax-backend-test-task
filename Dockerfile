@@ -16,6 +16,7 @@ FROM base as deps
 # Download dependencies as a separate step to take advantage of Docker's caching.
 # Leverage a cache mount to /root/.npm to speed up subsequent builds.
 # Leverage bind mounts to package.json and package-lock.json to avoid having to copy them into this layer.
+# Leverage bind mounts to package.json and package-lock.json to avoid having to copy them into this layer.
 RUN --mount=type=bind,source=package.json,target=package.json \
     --mount=type=bind,source=package-lock.json,target=package-lock.json \
     --mount=type=cache,id=cache-npm,target=/root/.npm \
@@ -25,6 +26,7 @@ RUN --mount=type=bind,source=package.json,target=package.json \
 # Create a stage for building the application.
 FROM deps as build
 
+# Download additional development dependencies before building.
 # Download additional development dependencies before building.
 RUN --mount=type=bind,source=package.json,target=package.json \
     --mount=type=bind,source=package-lock.json,target=package-lock.json \
@@ -42,6 +44,7 @@ RUN npm run build
 
 ################################################################################
 # Create a new stage to run the application with minimal runtime dependencies.
+# Create a new stage to run the application with minimal runtime dependencies.
 FROM base as final
 
 # Use production node environment by default.
@@ -53,6 +56,7 @@ USER node
 # Copy package.json so that package manager commands can be used.
 COPY package.json .
 
+# Copy the production dependencies from the deps stage and also the built application from the build stage into the image.
 # Copy the production dependencies from the deps stage and also the built application from the build stage into the image.
 COPY --from=deps /usr/src/app/node_modules ./node_modules
 COPY --from=build /usr/src/app/dist ./dist
