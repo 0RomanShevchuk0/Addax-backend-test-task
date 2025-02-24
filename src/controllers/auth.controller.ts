@@ -20,8 +20,6 @@ class AuthController {
       return
     }
 
-    await emailService.sendWelcomeEmail(user.email, user.name)
-
     res.json({ accessToken, user: mapUserToView(user) })
   }
 
@@ -34,7 +32,7 @@ class AuthController {
         return
       }
 
-      await emailService.sendWelcomeEmail(user.email, user.name)
+      emailService.sendWelcomeEmail(user.email, user.name)
 
       res.json({ accessToken, user: mapUserToView(user) })
     } catch (error) {
