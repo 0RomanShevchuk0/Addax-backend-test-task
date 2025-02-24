@@ -10,60 +10,48 @@ FROM node:${NODE_VERSION}-alpine as base
 WORKDIR /usr/src/app
 
 ################################################################################
-# Create a stage for installing production dependecies.
+# Create a stage for installing production dependencies.
 FROM base as deps
 
-# Download dependencies as a separate step to take advantage of Docker's caching.
-# Leverage a cache mount to /root/.npm to speed up subsequent builds.
-# Leverage bind mounts to package.json and package-lock.json to avoid having to copy them into this layer.
-# Leverage bind mounts to package.json and package-lock.json to avoid having to copy them into this layer.
-RUN --mount=type=bind,source=package.json,target=package.json \
-    --mount=type=bind,source=package-lock.json,target=package-lock.json \
-    --mount=type=cache,id=cache-npm,target=/root/.npm \
-    npm ci --omit=dev
+# Copy package.json и package-lock.json перед установкой зависимостей
+COPY package.json package-lock.json ./
+
+# Устанавливаем только production-зависимости
+RUN npm ci --omit=dev
 
 ################################################################################
 # Create a stage for building the application.
 FROM deps as build
 
-# Download additional development dependencies before building.
-# Download additional development dependencies before building.
-RUN --mount=type=bind,source=package.json,target=package.json \
-    --mount=type=bind,source=package-lock.json,target=package-lock.json \
-    --mount=type=cache,id=cache-npm,target=/root/.npm \
-    npm ci
-
-# Copy the rest of the source files into the image.
+# Копируем весь код
 COPY . .
 
-# Run Prisma generate to create the client and types
+# Генерируем Prisma Client
 RUN npx prisma generate
 
-# Run the build script.
+# Собираем приложение
 RUN npm run build
 
 ################################################################################
 # Create a new stage to run the application with minimal runtime dependencies.
-# Create a new stage to run the application with minimal runtime dependencies.
 FROM base as final
 
-# Use production node environment by default.
+# Используем production-окружение
 ENV NODE_ENV production
 
-# Run the application as a non-root user.
+# Запускаем сервер от пользователя node
 USER node
 
-# Copy package.json so that package manager commands can be used.
-COPY package.json .
+# Копируем package.json для работы с package manager
+COPY package.json ./
 
-# Copy the production dependencies from the deps stage and also the built application from the build stage into the image.
-# Copy the production dependencies from the deps stage and also the built application from the build stage into the image.
+# Копируем production-зависимости и собранное приложение
 COPY --from=deps /usr/src/app/node_modules ./node_modules
 COPY --from=build /usr/src/app/dist ./dist
 COPY --from=build /usr/src/app/node_modules/.prisma ./node_modules/.prisma
 
-# Expose the port that the application listens on.
+# Открываем порт приложения
 EXPOSE 4200
 
-# Run the application.
+# Запускаем сервер
 CMD npm start
