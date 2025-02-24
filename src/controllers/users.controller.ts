@@ -14,7 +14,7 @@ import { Result, ValidationError } from "express-validator"
 import { UserUpdateType } from "../types/user/user-update"
 import { mapUserToView } from "../mappers/user.mapper"
 import { HTTP_STATUSES } from "../constants/http-statuses"
-import { createUserErrorHandler } from "../utils/create-user-error-handler"
+import { prismaErrorsHandler } from "../utils/prisma-error-handler"
 import { requestContextService } from "../services/request-context.service"
 import { imageMimeTypes } from "../constants/mime-types"
 
@@ -64,7 +64,7 @@ class UsersController {
       const createdUser = await usersService.createUser(req.body)
       res.status(HTTP_STATUSES.CREATED_201).json(mapUserToView(createdUser))
     } catch (error) {
-      createUserErrorHandler(error, res)
+      prismaErrorsHandler(error, res)
     }
   }
 

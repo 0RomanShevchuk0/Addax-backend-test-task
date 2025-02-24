@@ -89,8 +89,7 @@ class UsersService {
 
     if (user.avatarUrl) {
       const currentAvatarFileKey = new URL(user.avatarUrl).pathname.slice(1)
-      const result = await s3Service.deleteFile(bucketName, currentAvatarFileKey)
-      console.log("UsersServiceuploadAvatar result:", result)
+      await s3Service.deleteFile(bucketName, currentAvatarFileKey)
     }
 
     const updatedUser = await usersRepository.updateOne(user.id, { avatarUrl })

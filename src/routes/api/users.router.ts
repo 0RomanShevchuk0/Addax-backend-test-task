@@ -21,8 +21,8 @@ usersRouter.post(
 
 usersRouter.post(
   "/upload-avatar",
-  authMiddleware,
   upload.single("avatar"),
+  authMiddleware,
   asyncHandler(userController.uploadProfilePhoto)
 )
 
