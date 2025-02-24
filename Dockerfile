@@ -3,40 +3,40 @@
 ARG NODE_VERSION=20.10.0
 
 ################################################################################
-# Use node image for base image for all stages.
+# 1️⃣ Базовый образ
 FROM node:${NODE_VERSION}-alpine as base
 
-# Set working directory for all build stages.
+# Устанавливаем рабочую директорию
 WORKDIR /usr/src/app
 
 ################################################################################
-# Create a stage for installing production dependencies.
+# 2️⃣ Установка зависимостей
 FROM base as deps
 
-# Copy package.json и package-lock.json перед установкой зависимостей
+# Копируем package.json и package-lock.json перед установкой зависимостей
 COPY package.json package-lock.json ./
 
-# Устанавливаем только production-зависимости
-RUN npm ci --omit=dev
+# Устанавливаем все зависимости, включая devDependencies (чтобы не потерять @types/...)
+RUN npm ci
 
 ################################################################################
-# Create a stage for building the application.
+# 3️⃣ Сборка приложения
 FROM deps as build
 
-# Копируем весь код
+# Копируем весь код проекта
 COPY . .
 
 # Генерируем Prisma Client
 RUN npx prisma generate
 
-# Собираем приложение
+# Собираем TypeScript в JavaScript
 RUN npm run build
 
 ################################################################################
-# Create a new stage to run the application with minimal runtime dependencies.
+# 4️⃣ Финальный образ для продакшена
 FROM base as final
 
-# Используем production-окружение
+# Устанавливаем переменную окружения в продакшн
 ENV NODE_ENV production
 
 # Запускаем сервер от пользователя node
@@ -54,4 +54,4 @@ COPY --from=build /usr/src/app/node_modules/.prisma ./node_modules/.prisma
 EXPOSE 4200
 
 # Запускаем сервер
-CMD npm start
+CMD ["npm", "start"]
