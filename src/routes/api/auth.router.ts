@@ -17,3 +17,7 @@ authRouter.post(
 )
 
 authRouter.get("/me", authMiddleware, asyncHandler(authController.me))
+
+authRouter.get("/access-token", asyncHandler(authController.refreshToken))
+
+authRouter.post("/logout", asyncHandler(authController.logout))

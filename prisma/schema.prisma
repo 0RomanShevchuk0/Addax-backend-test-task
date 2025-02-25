@@ -15,12 +15,13 @@ datasource db {
 }
 
 model User {
-  id           String  @id @default(uuid())
-  email        String  @unique
+  id           String        @id @default(uuid())
+  email        String        @unique
   name         String?
   avatarUrl    String?
   passwordHash String
   Task         Task[]
+  RefreshToken RefreshToken?
 }
 
 model Task {
@@ -31,4 +32,13 @@ model Task {
   date   DateTime
   notes  String?
   color  String?
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
 }

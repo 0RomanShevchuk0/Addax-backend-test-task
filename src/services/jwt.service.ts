@@ -13,8 +13,17 @@ class JwtService {
     }
 
     const userPayload: UserJwtPayload = { userId: user.id }
-    const token = jwt.sign(userPayload, env.JWT_SECRET, { expiresIn: "2h" })
+    const token = jwt.sign(userPayload, env.JWT_SECRET, { expiresIn: "1m" })
     return token
+  }
+
+  createRefreshToken(user: User) {
+    if (!env.JWT_SECRET) {
+      throw new Error("JWT_SECRET is missing in environment variables")
+    }
+		
+    const userPayload: UserJwtPayload = { userId: user.id }
+    return jwt.sign(userPayload, env.JWT_SECRET, { expiresIn: "7d" })
   }
 
   getUserIdByToken(token: string): string | null {

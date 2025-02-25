@@ -5,7 +5,7 @@ class EmailService {
   private transporter
 
   constructor() {
-    if (!env.SMTP_USER || env.SMTP_PASS) {
+    if (!env.SMTP_USER || !env.SMTP_PASS) {
       console.error("SMTP_USER or SMTP_PASS variable is missing.")
     }
 
