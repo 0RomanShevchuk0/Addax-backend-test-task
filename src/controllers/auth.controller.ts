@@ -56,13 +56,11 @@ class AuthController {
 
   async refreshToken(req: Request, res: Response) {
     const oldRefreshToken = req.cookies.refreshToken
-    console.log("AuthController refreshToken oldRefreshToken:", oldRefreshToken)
     if (!oldRefreshToken) {
       return res.sendStatus(HTTP_STATUSES.BAD_REQUEST_400)
     }
 
     const newTokens = await authService.getNewTokens(oldRefreshToken)
-    console.log("AuthController refreshToken newTokens:", newTokens)
 
     if (!newTokens) {
       res.sendStatus(HTTP_STATUSES.NOT_AUTHORIZED_401)
@@ -79,15 +77,11 @@ class AuthController {
 
   async logout(req: Request, res: Response) {
     const accessToken = req.cookies.accessToken
-    console.log(" AuthController logout accessToken:", accessToken)
     const refreshToken = req.cookies.refreshToken
-    console.log(" AuthController logout refreshToken:", refreshToken)
     const userId = jwtService.getUserIdByToken(refreshToken || accessToken)
-    console.log(" AuthController logout userId:", userId)
 
     if (!userId) {
       res.sendStatus(HTTP_STATUSES.NOT_AUTHORIZED_401)
-      console.log("NO USER_ID OR TOKENS")
       return
     }
 
