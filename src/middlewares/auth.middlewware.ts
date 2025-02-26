@@ -8,29 +8,25 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
   const authHeader = req.headers.authorization
 
   if (!authHeader) {
-    res.sendStatus(HTTP_STATUSES.NOT_AUTHORIZED_401)
+    res.status(HTTP_STATUSES.NOT_AUTHORIZED_401).send("jwt must be provided")
     return
   }
 
   const token = authHeader.split(" ")[1]
-
   if (!token) {
-    res.sendStatus(HTTP_STATUSES.NOT_AUTHORIZED_401)
-    return
+    return res.status(HTTP_STATUSES.NOT_AUTHORIZED_401).json({ message: "jwt must be provided" })
   }
 
   const userId = jwtService.getUserIdByToken(token)
 
   if (!userId) {
-    res.sendStatus(HTTP_STATUSES.NOT_AUTHORIZED_401)
-    return
+    return res.status(HTTP_STATUSES.NOT_AUTHORIZED_401).json({ message: "Invalid or expired jwt" })
   }
 
   const user = await usersService.getUserById(userId)
 
   if (!user) {
-    res.sendStatus(HTTP_STATUSES.NOT_AUTHORIZED_401)
-    return
+    return res.status(HTTP_STATUSES.NOT_AUTHORIZED_401).json({ message: "User not found" })
   }
 
   requestContextService.runWithRequestContext(

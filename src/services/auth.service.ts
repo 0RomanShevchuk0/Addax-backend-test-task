@@ -4,14 +4,14 @@ import { jwtService } from "./jwt.service"
 import { usersService } from "./users.service"
 import { refreshTokenRepository } from "../repositories/refresh-tokens.repository"
 
-type authReturnType = {
+type AuthReturnType = {
   user: User | null
   accessToken: string | null
   refreshToken: string | null
 }
 
 class AuthService {
-  async login(email: string, password: string): Promise<authReturnType> {
+  async login(email: string, password: string): Promise<AuthReturnType> {
     const user = await usersService.checkCredetrials(email, password)
     let accessToken = null
     let refreshToken = null
@@ -27,7 +27,7 @@ class AuthService {
     return { user, accessToken, refreshToken }
   }
 
-  async register(newUserData: UserCreateType): Promise<authReturnType> {
+  async register(newUserData: UserCreateType): Promise<AuthReturnType> {
     const user = await usersService.createUser(newUserData)
     let accessToken = null
     let refreshToken = null
@@ -43,27 +43,27 @@ class AuthService {
     return { user, accessToken, refreshToken }
   }
 
-  async getNewTokens(oldRefreshToken: string) {
+  async getNewTokens(oldRefreshToken: string): Promise<Omit<AuthReturnType, "user">> {
     const userId = jwtService.getUserIdByToken(oldRefreshToken)
 
     if (!userId) {
-      return null
+      throw new Error("invalid_token")
     }
 
     const user = await usersService.getUserById(userId)
 
     if (!user) {
-      return null
+      throw new Error("invalid_token")
     }
 
     const storedToken = await refreshTokenRepository.getTokenByUserId(user.id)
     if (!storedToken || storedToken.token !== oldRefreshToken) {
-      return null
+      throw new Error("token_mismatch")
     }
 
     if (new Date() > new Date(storedToken.expiresAt)) {
       await refreshTokenRepository.deleteToken(userId)
-      return null
+      throw new Error("token_expired")
     }
 
     const newAccessToken = jwtService.createJWT(user)

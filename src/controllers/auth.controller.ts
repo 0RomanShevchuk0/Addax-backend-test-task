@@ -55,24 +55,36 @@ class AuthController {
   }
 
   async refreshToken(req: Request, res: Response) {
-    const oldRefreshToken = req.cookies.refreshToken
-    if (!oldRefreshToken) {
-      return res.sendStatus(HTTP_STATUSES.BAD_REQUEST_400)
+    try {
+      const oldRefreshToken = req.cookies.refreshToken
+      if (!oldRefreshToken) {
+        return res
+          .status(HTTP_STATUSES.BAD_REQUEST_400)
+          .json({ message: "Refresh token is required" })
+      }
+
+      const newTokens = await authService.getNewTokens(oldRefreshToken)
+
+      if (!newTokens) {
+        throw new Error()
+      }
+
+      res.cookie("refreshToken", newTokens.refreshToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+      })
+      res.json({ accessToken: newTokens.accessToken })
+    } catch (error) {
+      if (error instanceof Error) {
+        console.log(" AuthControllerref reshToken if error instanceof Error")
+        if (error.message === "token_expired") {
+          return res.status(HTTP_STATUSES.FORBIDDEN_403).json({ message: "Refresh token expired" })
+        }
+      }
+
+      return res.status(HTTP_STATUSES.NOT_AUTHORIZED_401).json({ message: "Invalid refresh token" })
     }
-
-    const newTokens = await authService.getNewTokens(oldRefreshToken)
-
-    if (!newTokens) {
-      res.sendStatus(HTTP_STATUSES.NOT_AUTHORIZED_401)
-      return
-    }
-
-    res.cookie("refreshToken", newTokens.refreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
-    })
-    res.json({ accessToken: newTokens.accessToken })
   }
 
   async logout(req: Request, res: Response) {

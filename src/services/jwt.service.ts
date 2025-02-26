@@ -21,7 +21,7 @@ class JwtService {
     if (!env.JWT_SECRET) {
       throw new Error("JWT_SECRET is missing in environment variables")
     }
-		
+
     const userPayload: UserJwtPayload = { userId: user.id }
     return jwt.sign(userPayload, env.JWT_SECRET, { expiresIn: "7d" })
   }
