@@ -21,7 +21,7 @@ class AuthController {
       return
     }
 
-    res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: true, sameSite: "strict" })
+    res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: true, sameSite: "none" })
     res.json({ accessToken, user: mapUserToView(user) })
   }
 
@@ -36,7 +36,7 @@ class AuthController {
 
       emailService.sendWelcomeEmail(user.email, user.name)
 
-      res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: true, sameSite: "strict" })
+      res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: true, sameSite: "none" })
       res.json({ accessToken, user: mapUserToView(user) })
     } catch (error) {
       prismaErrorsHandler(error, res)
@@ -72,7 +72,7 @@ class AuthController {
     res.cookie("refreshToken", newTokens.refreshToken, {
       httpOnly: true,
       secure: true,
-      sameSite: "strict",
+      sameSite: "none",
     })
     res.json({ accessToken: newTokens.accessToken })
   }
