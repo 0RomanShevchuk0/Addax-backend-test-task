@@ -77,7 +77,7 @@ class AuthController {
       res.json({ accessToken: newTokens.accessToken })
     } catch (error) {
       if (error instanceof Error) {
-        console.log(" AuthControllerref reshToken if error instanceof Error")
+				console.log(" AuthControllerrefreshToken error.message:", error.message)
         if (error.message === "token_expired") {
           return res.status(HTTP_STATUSES.FORBIDDEN_403).json({ message: "Refresh token expired" })
         }

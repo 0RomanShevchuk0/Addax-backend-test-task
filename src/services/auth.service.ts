@@ -3,6 +3,7 @@ import { UserCreateType } from "./../types/user/user-create"
 import { jwtService } from "./jwt.service"
 import { usersService } from "./users.service"
 import { refreshTokenRepository } from "../repositories/refresh-tokens.repository"
+import { format, isPast } from "date-fns"
 
 type AuthReturnType = {
   user: User | null
@@ -44,7 +45,7 @@ class AuthService {
   }
 
   async getNewTokens(oldRefreshToken: string): Promise<Omit<AuthReturnType, "user">> {
-    const userId = jwtService.getUserIdByToken(oldRefreshToken)
+    const userId = jwtService.decodeRefreshToken(oldRefreshToken)
 
     if (!userId) {
       throw new Error("invalid_token")
@@ -61,8 +62,14 @@ class AuthService {
       throw new Error("token_mismatch")
     }
 
-    if (new Date() > new Date(storedToken.expiresAt)) {
-      await refreshTokenRepository.deleteToken(userId)
+    console.log(
+      "storedToken.expiresAt:",
+      format(new Date(storedToken.expiresAt), "yyyy-MM-dd HH:mm:ss")
+    )
+    console.log("storedToken.new date:", format(new Date(), "yyyy-MM-dd HH:mm:ss"))
+    console.log("isPast", isPast(new Date(storedToken.expiresAt)))
+    if (isPast(new Date(storedToken.expiresAt))) {
+      await refreshTokenRepository.deleteAllTokensForUser(userId)
       throw new Error("token_expired")
     }
 

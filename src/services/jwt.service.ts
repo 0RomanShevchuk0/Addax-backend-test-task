@@ -23,7 +23,7 @@ class JwtService {
     }
 
     const userPayload: UserJwtPayload = { userId: user.id }
-    return jwt.sign(userPayload, env.JWT_SECRET, { expiresIn: "7d" })
+    return jwt.sign(userPayload, env.JWT_SECRET, { expiresIn: "41s" })
   }
 
   getUserIdByToken(token: string): string | null {
@@ -37,6 +37,11 @@ class JwtService {
     } catch (error) {
       return null
     }
+  }
+
+  decodeRefreshToken(token: string): string | null {
+    const result = jwt.decode(token) as UserJwtPayload
+    return result.userId || null
   }
 }
 
