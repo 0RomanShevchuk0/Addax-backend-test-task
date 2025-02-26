@@ -13,7 +13,7 @@ class JwtService {
     }
 
     const userPayload: UserJwtPayload = { userId: user.id }
-    const token = jwt.sign(userPayload, env.JWT_SECRET, { expiresIn: "2h" })
+    const token = jwt.sign(userPayload, env.JWT_SECRET, { expiresIn: "20s" })
     return token
   }
 
