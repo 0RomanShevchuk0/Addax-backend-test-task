@@ -62,12 +62,6 @@ class AuthService {
       throw new Error("token_mismatch")
     }
 
-    console.log(
-      "storedToken.expiresAt:",
-      format(new Date(storedToken.expiresAt), "yyyy-MM-dd HH:mm:ss")
-    )
-    console.log("storedToken.new date:", format(new Date(), "yyyy-MM-dd HH:mm:ss"))
-    console.log("isPast", isPast(new Date(storedToken.expiresAt)))
     if (isPast(new Date(storedToken.expiresAt))) {
       await refreshTokenRepository.deleteAllTokensForUser(userId)
       throw new Error("token_expired")

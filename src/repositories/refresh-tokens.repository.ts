@@ -1,5 +1,6 @@
-import { addDays, addSeconds } from "date-fns"
+import { addDays } from "date-fns"
 import prisma from "../config/prisma.client"
+import { REFRESH_TOKEN_DAYS_DURATION } from "../constants/tokens"
 
 class RefreshTokenRepository {
   async getTokenByUserId(userId: string) {
@@ -9,8 +10,12 @@ class RefreshTokenRepository {
   async saveToken(userId: string, refreshToken: string) {
     return prisma.refreshToken.upsert({
       where: { userId },
-      create: { userId, token: refreshToken, expiresAt: addSeconds(new Date(), 41) },
-      update: { token: refreshToken, expiresAt: addSeconds(new Date(), 41) },
+      create: {
+        userId,
+        token: refreshToken,
+        expiresAt: addDays(new Date(), REFRESH_TOKEN_DAYS_DURATION),
+      },
+      update: { token: refreshToken, expiresAt: addDays(new Date(), REFRESH_TOKEN_DAYS_DURATION) },
     })
   }
 

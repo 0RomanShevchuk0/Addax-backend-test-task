@@ -1,6 +1,7 @@
 import { User } from "@prisma/client"
 import { env } from "../config/env"
 import jwt, { JwtPayload } from "jsonwebtoken"
+import { TOKENS_DURATION_MS } from "../constants/tokens"
 
 interface UserJwtPayload extends JwtPayload {
   userId: string
@@ -13,7 +14,7 @@ class JwtService {
     }
 
     const userPayload: UserJwtPayload = { userId: user.id }
-    const token = jwt.sign(userPayload, env.JWT_SECRET, { expiresIn: "20s" })
+    const token = jwt.sign(userPayload, env.JWT_SECRET, { expiresIn: TOKENS_DURATION_MS.ACCESS })
     return token
   }
 
@@ -23,7 +24,7 @@ class JwtService {
     }
 
     const userPayload: UserJwtPayload = { userId: user.id }
-    return jwt.sign(userPayload, env.JWT_SECRET, { expiresIn: "41s" })
+    return jwt.sign(userPayload, env.JWT_SECRET, { expiresIn: TOKENS_DURATION_MS.REFRESH })
   }
 
   getUserIdByToken(token: string): string | null {
