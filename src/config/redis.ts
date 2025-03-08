@@ -5,9 +5,28 @@ if (!env.REDIS_URL) {
   throw new Error("REDIS_URL is missing in env variables")
 }
 
-const redis = new Redis(env.REDIS_URL, { lazyConnect: true, enableOfflineQueue: false })
+const redis = new Redis(env.REDIS_URL, {
+  connectTimeout: 5000, // 5 сек на подключение
+  maxRetriesPerRequest: 2, // Ограничение на ретраи
+  enableOfflineQueue: false, // Без очереди
+  keepAlive: 1, // Включает TCP Keep-Alive
+})
 
 redis.on("connect", () => console.log("🔌 Redis connected"))
 redis.on("error", (err) => console.error("❌ Redis error:", err))
+
+async function testRedisLatency() {
+  const start = Date.now()
+  try {
+    await redis.ping()
+    console.log(`✅ Redis PING time: ${Date.now() - start}ms`)
+  } catch (err) {
+    console.error("❌ Redis PING failed:", err)
+  } finally {
+    redis.quit()
+  }
+}
+
+testRedisLatency()
 
 export default redis
