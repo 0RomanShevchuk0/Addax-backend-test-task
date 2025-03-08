@@ -51,8 +51,11 @@ class UsersController {
     const cacheKey = `user:${userId}`
     const cachedUser = await getCachedData(cacheKey)
     if (cachedUser) {
-      return res.send(cachedUser)
-    }
+			console.log("Returning cached data");
+			return res.send(cachedUser);
+		} else {
+			console.log("Cache miss, fetching from DB");
+		}
 
     const foundUser = await usersService.getUserById(userId)
     if (!foundUser) {
