@@ -4,6 +4,7 @@ import AppRouter from "./routes"
 import { errorHandler } from "./middlewares/error-handler/error-handler.midleware"
 import cookieParser from "cookie-parser";
 
+
 export const app = express()
 
 app.use(express.json())

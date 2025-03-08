@@ -17,6 +17,7 @@ import { HTTP_STATUSES } from "../constants/http-statuses"
 import { prismaErrorsHandler } from "../utils/prisma-error-handler"
 import { requestContextService } from "../services/request-context.service"
 import { imageMimeTypes } from "../constants/mime-types"
+import { deleteCacheData, getCachedData, setCacheData } from "../utils/cache.utils"
 
 class UsersController {
   async getAll(
@@ -47,11 +48,19 @@ class UsersController {
   async getById(req: RequestWithParams<URIParamUserIdType>, res: Response<UserViewType>) {
     const userId = req.params.id
 
+    const cacheKey = `user:${userId}`
+    const cachedUser = await getCachedData(cacheKey)
+    if (cachedUser) {
+      return res.send(cachedUser)
+    }
+
     const foundUser = await usersService.getUserById(userId)
     if (!foundUser) {
       res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
       return
     }
+
+    await setCacheData(cacheKey, mapUserToView(foundUser), 600)
 
     res.json(mapUserToView(foundUser))
   }
@@ -73,12 +82,16 @@ class UsersController {
     res: Response<UserViewType | Result<ValidationError>>
   ) {
     const userId = req.params.id
+
     const updatedUser = await usersService.updateUser(userId, req.body)
 
     if (!updatedUser) {
       res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
       return
     }
+
+    const cacheKey = `user:${userId}`
+    deleteCacheData(cacheKey)
 
     res.status(HTTP_STATUSES.OK_200).json(mapUserToView(updatedUser))
   }
@@ -87,6 +100,11 @@ class UsersController {
     const userId = req.params.id
     const isDeleted = await usersService.deleteUser(userId)
     const resultStatus = isDeleted ? HTTP_STATUSES.NO_CONTENT_204 : HTTP_STATUSES.NOT_FOUND_404
+
+    if (isDeleted) {
+      const cacheKey = `user:${userId}`
+      deleteCacheData(cacheKey)
+    }
 
     res.sendStatus(resultStatus)
   }
@@ -113,6 +131,9 @@ class UsersController {
       res.sendStatus(HTTP_STATUSES.BAD_REQUEST_400)
       return
     }
+
+    const cacheKey = `user:${user.id}`
+    deleteCacheData(cacheKey)
 
     res.status(HTTP_STATUSES.OK_200).json({ avatarUrl })
   }
