@@ -21,7 +21,7 @@ class EmailService {
   }
 
   async sendWelcomeEmail(email: string, name?: string | null) {
-    const frontAppUrl = process.env.FRONTEND_URL
+    const frontAppUrl = env.FRONTEND_URL
 
     const frontendAuthUrl = `${frontAppUrl}/auth`
 
