@@ -8,7 +8,9 @@ if (!env.REDIS_URL) {
 const redis = new Redis(env.REDIS_URL, {
   connectTimeout: 5000, // 5 сек на подключение
   maxRetriesPerRequest: 2, // Ограничение на ретраи
-  keepAlive: 1, // Включает TCP Keep-Alive
+  lazyConnect: true, // Подключение только при первом запросе
+  keepAlive: 1, // Поддержка TCP Keep-Alive
+  enableAutoPipelining: true, // Оптимизация команд
 })
 
 redis.on("connect", () => console.log("🔌 Redis connected"))
