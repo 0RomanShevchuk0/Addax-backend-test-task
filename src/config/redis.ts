@@ -8,7 +8,6 @@ if (!env.REDIS_URL) {
 const redis = new Redis(env.REDIS_URL, {
   connectTimeout: 5000, // 5 сек на подключение
   maxRetriesPerRequest: 2, // Ограничение на ретраи
-  enableOfflineQueue: false, // Без очереди
   keepAlive: 1, // Включает TCP Keep-Alive
 })
 
